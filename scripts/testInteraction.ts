@@ -1,5 +1,4 @@
-import { ethers } from "hardhat";
-import { network } from "hardhat";
+import { ethers, network } from "hardhat";
 import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
@@ -11,7 +10,14 @@ async function main(): Promise<void> {
     throw new Error("❌ PRIVATE_KEY is not set in .env file");
   }
 
-  const provider = ethers.getDefaultProvider(network.name);
+  let provider;
+
+  if (network.name === "localhost") {
+    provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+  } else {
+    provider = ethers.getDefaultProvider(network.name);
+  }
+
   const deployer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
   const filePath = path.join(__dirname, "deployed_addresses.json");
@@ -61,13 +67,13 @@ async function main(): Promise<void> {
 
   const amountA = ethers.parseUnits("100", 18);
   const amountB = ethers.parseUnits("50", 18);
-  console.log(`🔹 Adding Liquidity... for ${amountA} TokenA and ${amountB} TokenB`);
+  console.log(`🔹 Adding Liquidity... for ${ethers.formatUnits(amountA, 18)} TokenA and ${ethers.formatUnits(amountB, 18)} TokenB`);
   const tx3 = await dex.addLiquidity(tokenAAddress, tokenBAddress, amountA, amountB, { nonce: nonce++ });
   await tx3.wait();
   console.log("✅ Liquidity Added");
 
   const swapAmountA = ethers.parseUnits("10", 18);
-  console.log(`🔹 Swapping ${swapAmountA} TokenA for TokenB...`);
+  console.log(`🔹 Swapping ${ethers.formatUnits(swapAmountA, 18)} TokenA for TokenB...`);
   const tx4 = await dex.swap(tokenAAddress, tokenBAddress, swapAmountA, { nonce: nonce++ });
   await tx4.wait();
   console.log("✅ Swap Complete");
