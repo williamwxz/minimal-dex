@@ -1,0 +1,28 @@
+node_modules
+.env
+typechain-types/
+
+# Build artifacts
+/build/
+artifacts/
+cache/
+
+# IDE specific files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Test results
+test-results/
