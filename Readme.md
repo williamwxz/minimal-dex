@@ -66,13 +66,6 @@ Edit the `.env` file with your own values.
 npx hardhat compile
 ```
 
-## Deploy locally
-```bash
-npx hardhat node
-npx hardhat run scripts/deployTokens.ts --network localhost
-npx hardhat run scripts/deployDex.ts --network localhost
-```
-
 ## Test
 ```bash
 npx hardhat test
@@ -83,6 +76,26 @@ npx hardhat test
 npx hardhat coverage
 ```
 
+-----------------|----------|----------|----------|----------|----------------|
+File             |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
+-----------------|----------|----------|----------|----------|----------------|
+ contracts/      |      100 |       90 |      100 |      100 |                |
+  MinimalDex.sol |      100 |    88.89 |      100 |      100 |                |
+  MockERC20.sol  |      100 |      100 |      100 |      100 |                |
+-----------------|----------|----------|----------|----------|----------------|
+All files        |      100 |       90 |      100 |      100 |                |
+-----------------|----------|----------|----------|----------|----------------|
+
+## Deploy locally
+```bash
+npx hardhat node
+npx hardhat run scripts/deployTokens.ts --network localhost
+npx hardhat run scripts/deployDex.ts --network localhost
+```
+1. Make sure you have the correct private key in the `.env` file
+2. Run the `deployTokens.ts` script to deploy the tokens
+3. Run the `deployDex.ts` script to deploy the dex
+
 ## Verify
 ```bash
 npx hardhat verify --network sepolia <CONTRACT_ADDRESS> <CONSTRUCTOR_ARGS>
@@ -90,5 +103,6 @@ npx hardhat verify --network sepolia <CONTRACT_ADDRESS> <CONSTRUCTOR_ARGS>
 
 ## Interact with the contract
 ```bash
-npx hardhat run scripts/interact.ts --network localhost
+npx ts-node scripts/testInteraction.ts
 ```
+

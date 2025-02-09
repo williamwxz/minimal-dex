@@ -6,13 +6,12 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log(`Deploying tokens with account: ${deployer.address}`);
 
-  const mockUSDC = await ethers.getContractFactory("MockUSDC");
-  const mockUSDCContract = await mockUSDC.deploy();
+  const mockERC20 = await ethers.getContractFactory("MockERC20");
+  const mockUSDCContract = await mockERC20.deploy("Mock USDC", "USDC");
   await mockUSDCContract.waitForDeployment();
   console.log(`✅ MockUSDC deployed at: ${await mockUSDCContract.getAddress()}`);
 
-  const mockUSDT = await ethers.getContractFactory("MockUSDT"); 
-  const mockUSDTContract = await mockUSDT.deploy();
+  const mockUSDTContract = await mockERC20.deploy("Mock USDT", "USDT");
   await mockUSDTContract.waitForDeployment();
   console.log(`✅ MockUSDT deployed at: ${await mockUSDTContract.getAddress()}`);
 
@@ -20,6 +19,7 @@ async function main() {
   const deployedAddresses = {
     tokenA: await mockUSDCContract.getAddress(),
     tokenB: await mockUSDTContract.getAddress(),
+    deployer: deployer.address,
   };
 
   const filePath = path.join(__dirname, "deployed_addresses.json");

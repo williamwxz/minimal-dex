@@ -1,10 +1,13 @@
 node_modules
 .env
 typechain-types/
+scripts/deployed_addresses.json
+scripts/*.js
 
 # Build artifacts
 /build/
 artifacts/
+
 cache/
 
 # IDE specific files
