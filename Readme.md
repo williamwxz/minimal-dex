@@ -89,6 +89,9 @@ All files        |      100 |       90 |      100 |      100 |                |
 ## Deploy locally
 ```bash
 npx hardhat node
+
+# Make sure PRIVATE_KEY is set in the `.env` file
+
 npx hardhat run scripts/deployTokens.ts --network localhost
 npx hardhat run scripts/deployDex.ts --network localhost
 ```
@@ -96,13 +99,29 @@ npx hardhat run scripts/deployDex.ts --network localhost
 2. Run the `deployTokens.ts` script to deploy the tokens
 3. Run the `deployDex.ts` script to deploy the dex
 
+## Deploy on Sepolia
+```bash
+npx hardhat run scripts/deployTokens.ts --network sepolia
+npx hardhat run scripts/deployDex.ts --network sepolia
+```
+
+deployed contracts on *Sepolia*:
+```json
+{
+  "tokenA": "0x26F8fa526dcbD53Ec039302FF319b517ecc8F32f",
+  "tokenB": "0x8988061B19e06bd40cF84a04fCdCA53614477Ba5",
+  "deployer": "0x24BaE140446f32cDb02Cf09B18fBA34Ba4527B57",
+  "dex": "0xa1c6e4C088A9847e3AD2E832687a9B1B0452ac6B"
+}
+```
+
 ## Verify
 ```bash
-npx hardhat verify --network sepolia <CONTRACT_ADDRESS> <CONSTRUCTOR_ARGS>
+npx hardhat run scripts/verifyContracts.ts --network sepolia
 ```
 
 ## Interact with the contract
 ```bash
-npx ts-node scripts/testInteraction.ts
+npx hardhat run scripts/testInteraction.ts --network sepolia
 ```
 

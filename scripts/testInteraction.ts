@@ -1,4 +1,5 @@
 import { ethers } from "hardhat";
+import { network } from "hardhat";
 import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
@@ -6,16 +7,13 @@ import * as path from "path";
 dotenv.config();
 
 async function main(): Promise<void> {
-  // Load .env variables
   if (!process.env.PRIVATE_KEY) {
     throw new Error("❌ PRIVATE_KEY is not set in .env file");
   }
 
-  // Connect to Hardhat Local Node
-  const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+  const provider = ethers.getDefaultProvider(network.name);
   const deployer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
-  // Load deployed contract addresses
   const filePath = path.join(__dirname, "deployed_addresses.json");
   if (!fs.existsSync(filePath)) {
     throw new Error("❌ deployed_addresses.json not found. Run deployment scripts first.");
@@ -30,19 +28,15 @@ async function main(): Promise<void> {
   console.log(`🔍 Using TokenB: ${tokenBAddress}`);
   console.log(`🔍 Using MinimalDex: ${dexAddress}`);
 
-  // Attach to Token Contracts
   const tokenA = await ethers.getContractAt("MockERC20", tokenAAddress, deployer);
   const tokenB = await ethers.getContractAt("MockERC20", tokenBAddress, deployer);
   const dex = await ethers.getContractAt("MinimalDex", dexAddress, deployer);
 
-  // Check Balance
   const balanceA = await tokenA.balanceOf(deployer.address);
   console.log(`💰 TokenA Balance: ${ethers.formatUnits(balanceA, 18)} Tokens`);
 
-  // Get the current nonce
   let nonce = await provider.getTransactionCount(deployer.address);
 
-  // Check and approve TokenA if needed
   const requiredAllowanceA = ethers.parseUnits("110", 18);
   const currentAllowanceA = await tokenA.allowance(deployer.address, dex.target);
   if (currentAllowanceA < requiredAllowanceA) {
@@ -54,7 +48,6 @@ async function main(): Promise<void> {
     console.log("✅ Sufficient allowance for TokenA");
   }
 
-  // Check and approve TokenB if needed
   const requiredAllowanceB = ethers.parseUnits("60", 18);
   const currentAllowanceB = await tokenB.allowance(deployer.address, dex.target);
   if (currentAllowanceB < requiredAllowanceB) {
@@ -66,18 +59,19 @@ async function main(): Promise<void> {
     console.log("✅ Sufficient allowance for TokenB");
   }
 
-  // Add Liquidity
-  console.log("🔹 Adding Liquidity...");
-  const tx3 = await dex.addLiquidity(tokenAAddress, tokenBAddress, ethers.parseUnits("100", 18), ethers.parseUnits("50", 18), { nonce: nonce++ });
+  const amountA = ethers.parseUnits("100", 18);
+  const amountB = ethers.parseUnits("50", 18);
+  console.log(`🔹 Adding Liquidity... for ${amountA} TokenA and ${amountB} TokenB`);
+  const tx3 = await dex.addLiquidity(tokenAAddress, tokenBAddress, amountA, amountB, { nonce: nonce++ });
   await tx3.wait();
   console.log("✅ Liquidity Added");
 
-  // Swap 10 TokenA for TokenB
-  console.log("🔹 Swapping 10 TokenA for TokenB...");
-  const tx4 = await dex.swap(tokenAAddress, tokenBAddress, ethers.parseUnits("10", 18), { nonce: nonce++ });
+  const swapAmountA = ethers.parseUnits("10", 18);
+  console.log(`🔹 Swapping ${swapAmountA} TokenA for TokenB...`);
+  const tx4 = await dex.swap(tokenAAddress, tokenBAddress, swapAmountA, { nonce: nonce++ });
   await tx4.wait();
   console.log("✅ Swap Complete");
-  // Check New Balances
+
   const newBalanceA = await tokenA.balanceOf(deployer.address);
   const newBalanceB = await tokenB.balanceOf(deployer.address);
   console.log(`💰 New TokenA Balance: ${ethers.formatUnits(newBalanceA, 18)} Tokens`);
